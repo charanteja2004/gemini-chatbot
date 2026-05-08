@@ -7,7 +7,7 @@ import './App.css';
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 function App() {
   const [chats, setChats] = useState([]);
