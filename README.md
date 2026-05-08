@@ -19,19 +19,11 @@ A minimal, responsive web-based chatbot using the modern Google GenAI SDK (`goog
 ### 1. Backend Setup
 
 1. Open a terminal and navigate to the root directory.
-2. Create and activate a Python virtual environment:
+2. Install the dependencies:
    ```bash
-   python -m venv venv
-   # On Windows:
-   .\venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
+   pip install -r requirements.txt
    ```
-3. Install the dependencies:
-   ```bash
-   pip install fastapi uvicorn google-genai pypdf python-multipart pillow python-dotenv
-   ```
-4. Create a `.env` file in the root directory (where `main.py` is located) and add your Gemini API Key:
+3. Create a `.env` file in the root directory (where `main.py` is located) and add your Gemini API Key:
    ```env
    GEMINI_API_KEY="your_api_key_here"
    ```
@@ -76,3 +68,22 @@ A minimal, responsive web-based chatbot using the modern Google GenAI SDK (`goog
 4. **Context Reset**:
    - Click the "New Chat" button in the sidebar.
    - Ask "What did I just upload?" -> The bot will indicate it doesn't know, verifying the reset.
+
+## Deployment
+
+### Deploy Backend (Render)
+1. Push your repository to GitHub.
+2. Go to [Render](https://render.com) -> New Web Service.
+3. Connect your repository.
+4. **Build Command**: `pip install -r requirements.txt`
+5. **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port 10000`
+6. Add `GEMINI_API_KEY` to Environment Variables.
+7. Copy the generated live URL (e.g., `https://my-api.onrender.com`).
+
+### Deploy Frontend (Vercel)
+1. Go to [Vercel](https://vercel.com) -> Add New Project.
+2. Import your GitHub repository.
+3. Set **Root Directory** to `frontend`.
+4. Add Environment Variable:
+   - `VITE_API_URL`: Your Render URL followed by `/api` (e.g., `https://my-api.onrender.com/api`).
+5. Click **Deploy**.
