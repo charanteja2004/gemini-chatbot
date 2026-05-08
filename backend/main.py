@@ -49,28 +49,19 @@ class ChatResponse(BaseModel):
 async def chat(request: ChatRequest):
     session = get_session(request.chat_id)
     
-    contents = []
+    parts = []
     
     # 1. Add context from documents if available
     for doc in session["documents"]:
-        contents.append(f"Document Context:\n{doc}\n")
+        parts.append(types.Part.from_text(text=f"Document Context:\n{doc}\n"))
     
     # 2. Add uploaded images for this message
     for img in session["images"]:
-        contents.append(img)
+        parts.append(types.Part.from_bytes(data=img["data"], mime_type=img["mime_type"]))
     
     # 3. Add the user's message
-    contents.append(request.message)
+    parts.append(types.Part.from_text(text=request.message))
     
-    # Convert to standard types.Content for history tracking
-    parts = []
-    for part in contents:
-        if isinstance(part, str):
-            parts.append(types.Part.from_text(text=part))
-        else:
-            # part is PIL.Image
-            parts.append(types.Part.from_image(part))
-            
     user_content = types.Content(role="user", parts=parts)
     
     # Trim history to keep it recent (last 10 messages = 5 turns)
@@ -139,8 +130,9 @@ async def upload_image(chat_id: str = Form(...), file: UploadFile = File(...)):
     content = await file.read()
     try:
         image = Image.open(BytesIO(content))
-        image.load() # ensure loaded
-        session["images"].append(image)
+        image.verify() # verify it's an image
+        mime_type = "image/jpeg" if ext == "jpg" else f"image/{ext}"
+        session["images"].append({"data": content, "mime_type": mime_type})
         return {"message": "Image uploaded successfully", "filename": file.filename}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to process image: {str(e)}")
