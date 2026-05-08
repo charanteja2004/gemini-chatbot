@@ -7,7 +7,9 @@ import './App.css';
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+let API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+if (API_BASE.endsWith('/')) API_BASE = API_BASE.slice(0, -1);
+if (!API_BASE.endsWith('/api')) API_BASE += '/api';
 
 function App() {
   const [chats, setChats] = useState([]);
